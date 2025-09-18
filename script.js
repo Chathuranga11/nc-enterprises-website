@@ -1,108 +1,116 @@
-document.addEventListener('DOMContentLoaded', () => {
+// Mobile Navigation Toggle
+const mobileMenu = document.getElementById("mobile-menu")
+const navMenu = document.getElementById("nav-menu")
 
-    // ============================================
-    // MOBILE NAVIGATION (HAMBURGER MENU)
-    // ============================================
-    const burger = document.querySelector('.burger');
-    const nav = document.querySelector('.nav-links');
-    const navLinks = document.querySelectorAll('.nav-links li');
+mobileMenu.addEventListener("click", () => {
+  mobileMenu.classList.toggle("active")
+  navMenu.classList.toggle("active")
+})
 
-    burger.addEventListener('click', () => {
-        // Toggle Nav
-        nav.classList.toggle('nav-active');
+// Close mobile menu when clicking on a link
+document.querySelectorAll(".nav-link").forEach((link) => {
+  link.addEventListener("click", () => {
+    mobileMenu.classList.remove("active")
+    navMenu.classList.remove("active")
+  })
+})
 
-        // Animate Links
-        navLinks.forEach((link, index) => {
-            if (link.style.animation) {
-                link.style.animation = '';
-            } else {
-                link.style.animation = `navLinkFade 0.5s ease forwards ${index / 7 + 0.3}s`;
-            }
-        });
+// Sticky Navigation
+const navbar = document.getElementById("navbar")
+let lastScrollTop = 0
 
-        // Burger Animation
-        burger.classList.toggle('toggle');
-    });
+window.addEventListener("scroll", () => {
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop
 
-    // ============================================
-    // STICKY HEADER
-    // ============================================
-    const header = document.getElementById('header');
-    const stickyPos = header.offsetTop + 50;
+  if (scrollTop > 100) {
+    navbar.classList.add("scrolled")
+  } else {
+    navbar.classList.remove("scrolled")
+  }
 
-    window.addEventListener('scroll', () => {
-        if (window.pageYOffset > stickyPos) {
-            header.classList.add('sticky');
-        } else {
-            header.classList.remove('sticky');
-        }
-    });
+  lastScrollTop = scrollTop
+})
 
-    // ============================================
-    // FADE-IN ANIMATIONS ON SCROLL
-    // ============================================
-    const faders = document.querySelectorAll('.fade-in');
-
-    const appearOptions = {
-        threshold: 0.2, // Trigger when 20% of the element is visible
-    };
-
-    const appearOnScroll = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (!entry.isIntersecting) {
-                return;
-            } else {
-                entry.target.classList.add('visible');
-                observer.unobserve(entry.target); // Stop observing once it's visible
-            }
-        });
-    }, appearOptions);
-
-    faders.forEach(fader => {
-        appearOnScroll.observe(fader);
-    });
-    
-    // Trigger hero animation on page load
-    const heroElements = document.querySelectorAll('.hero-content .fade-in');
-    heroElements.forEach(el => el.classList.add('visible'));
-
-
-    // ============================================
-    // DYNAMIC COPYRIGHT YEAR
-    // ============================================
-    const yearSpan = document.getElementById('year');
-    if (yearSpan) {
-        yearSpan.textContent = new Date().getFullYear();
+// Smooth Scrolling for Navigation Links
+document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+  anchor.addEventListener("click", function (e) {
+    e.preventDefault()
+    const target = document.querySelector(this.getAttribute("href"))
+    if (target) {
+      const offsetTop = target.offsetTop - 70 // Account for fixed navbar
+      window.scrollTo({
+        top: offsetTop,
+        behavior: "smooth",
+      })
     }
+  })
+})
 
-    // ============================================
-    // CONTACT FORM TO WHATSAPP
-    // ============================================
-    const whatsappForm = document.getElementById('whatsapp-form');
-    
-    if (whatsappForm) {
-        whatsappForm.addEventListener('submit', function(event) {
-            // Prevent the default form submission
-            event.preventDefault();
+// Scroll Animations
+const observerOptions = {
+  threshold: 0.1,
+  rootMargin: "0px 0px -50px 0px",
+}
 
-            // Get the values from the form fields
-            const name = document.getElementById('contact-name').value;
-            const message = document.getElementById('contact-message').value;
-            
-            // Your WhatsApp number (without '+' or '00')
-            const phoneNumber = '94719228571';
-
-            // Create the pre-filled message
-            const whatsappMessage = `Hello NC Enterprises, my name is ${name}. I have a query:\n\n"${message}"`;
-
-            // Encode the message for the URL
-            const encodedMessage = encodeURIComponent(whatsappMessage);
-
-            // Create the final WhatsApp URL
-            const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
-            
-            // Open the URL in a new tab
-            window.open(whatsappURL, '_blank');
-        });
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add("visible")
     }
-});
+  })
+}, observerOptions)
+
+// Observe all fade-in elements
+document.querySelectorAll(".fade-in").forEach((el) => {
+  observer.observe(el)
+})
+
+// Add loading animation to page
+window.addEventListener("load", () => {
+  document.body.style.opacity = "0"
+  document.body.style.transition = "opacity 0.5s ease"
+
+  setTimeout(() => {
+    document.body.style.opacity = "1"
+  }, 100)
+})
+
+// Add hover effects to service cards
+document.querySelectorAll(".service-card").forEach((card) => {
+  card.addEventListener("mouseenter", () => {
+    card.style.transform = "translateY(-10px) scale(1.02)"
+  })
+
+  card.addEventListener("mouseleave", () => {
+    card.style.transform = "translateY(0) scale(1)"
+  })
+})
+
+// Add click tracking for WhatsApp button
+document.querySelector(".whatsapp-button").addEventListener("click", () => {
+  // You can add analytics tracking here if needed
+  console.log("WhatsApp button clicked")
+})
+
+// Add active navigation highlighting
+window.addEventListener("scroll", () => {
+  const sections = document.querySelectorAll("section[id]")
+  const navLinks = document.querySelectorAll(".nav-link")
+
+  let current = ""
+  sections.forEach((section) => {
+    const sectionTop = section.offsetTop - 100
+    const sectionHeight = section.clientHeight
+
+    if (window.pageYOffset >= sectionTop && window.pageYOffset < sectionTop + sectionHeight) {
+      current = section.getAttribute("id")
+    }
+  })
+
+  navLinks.forEach((link) => {
+    link.classList.remove("active")
+    if (link.getAttribute("href") === `#${current}`) {
+      link.classList.add("active")
+    }
+  })
+})
